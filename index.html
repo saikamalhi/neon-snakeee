@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="NEON SNAKE arcade game by Saika Malhi">
+<title>NEON SNAKE | Cyber Arcade</title><link rel="stylesheet" href="css/style.css">
+</head><body>
+<header class="topbar"><a class="brand" href="#">◆ NEON<span>SNAKE</span></a><div class="status">● ARCADE SYSTEM ONLINE</div><button id="soundToggle" class="smallbtn">♫ <span id="soundLabel">SOUND ON</span></button></header>
+<main class="shell">
+<section class="intro"><p class="eyebrow">CLASSIC ARCADE // REIMAGINED</p><h1>ENTER THE <span>NEON</span><br>GRID.</h1><p>One snake. Endless neon. How long can you survive?</p></section>
+<section class="layout">
+<aside class="panel stats"><h3>PLAYER TELEMETRY</h3>
+<div class="stat"><small>CURRENT SCORE</small><strong id="score">000</strong><small>POINTS</small></div>
+<div class="stat"><small>HIGH SCORE</small><strong id="highScore" class="purple">000</strong><small>PERSONAL BEST</small></div>
+<div class="stat"><small>GAME SPEED</small><strong id="speedValue">1.0x</strong></div>
+<div class="stat"><small>LEVEL</small><strong id="levelValue">01</strong></div>
+<label class="difficulty">STARTING SPEED<select id="difficulty"><option value="easy">EASY</option><option value="normal" selected>NORMAL</option><option value="hard">HARD</option></select></label>
+<p class="note">✦ Your best score is saved on this device.</p></aside>
+<div class="arena"><div class="arena-head"><span>● LIVE ARENA</span><span id="arenaState">SYSTEM READY</span></div>
+<div class="game-frame"><canvas id="gameCanvas" width="600" height="600"></canvas>
+<div id="overlay" class="overlay"><div class="overlay-content"><div class="emblem">⌁</div><small id="overlayKicker">WELCOME TO THE GRID</small><h2 id="overlayTitle">READY<br><span>PLAYER ONE?</span></h2><p id="overlayText">Collect energy. Avoid the walls. Don't cross your own path.</p><button id="mainAction" class="start">▶ START GAME</button><small class="hint">PRESS ENTER TO BEGIN</small></div></div></div>
+<div class="arena-foot"><span>● ENERGY CELL</span><span>▰ PLAYER</span><span>GRID: 20 × 20</span></div>
+<div class="buttons"><button id="pauseButton" disabled>Ⅱ PAUSE</button><button id="restartButton">↻ RESTART</button></div></div>
+<aside class="panel guide"><h3>CONTROL DECK</h3><p class="muted">NAVIGATE YOUR SNAKE</p><div class="keypad"><i></i><kbd>↑</kbd><i></i><kbd>←</kbd><kbd>↓</kbd><kbd>→</kbd></div><p class="keys"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> OR WASD</p><hr>
+<div class="guideitem"><b>✦ COLLECT</b><small>Grab glowing energy cells to score.</small></div><div class="guideitem"><b>× AVOID</b><small>Walls and your own tail end the run.</small></div><div class="guideitem"><b>Ⅱ PAUSE</b><small>Press Space to pause or resume.</small></div>
+<div class="mobile-pad"><button data-dir="up">▲</button><button data-dir="left">◀</button><button data-dir="down">▼</button><button data-dir="right">▶</button></div></aside>
+</section>
+<section class="info-grid">
+<article><b>⌖ HOW TO PLAY</b><p>Guide the snake around the arena and collect glowing energy cells. Each cell adds 10 points and makes your snake longer. The game gets faster as your score climbs.</p></article>
+<article><b>⚡ LEVEL UP</b><p>Every 50 points advances your level. Higher levels increase the challenge, so plan your turns and watch the space ahead.</p></article>
+<article><b>⌨ QUICK CONTROLS</b><p>Use Arrow Keys or W, A, S, D to move. Press Space to pause or resume. Touch players can use the on-screen direction pad.</p></article>
+</section>
+<section class="about"><div><small>ABOUT THE PROJECT</small><h2>OLD-SCHOOL GAMEPLAY.<br><span>NEW-SCHOOL ENERGY.</span></h2></div><p>NEON SNAKE is a browser-based arcade game built with HTML5, CSS3 and vanilla JavaScript. It combines classic gameplay with a futuristic neon interface, responsive controls and locally saved high scores.</p></section>
+</main>
+<footer>◆ Designed &amp; Developed by Saika Malhi © 2026 <span>NEON SNAKE // ARCADE EDITION</span></footer>
+<script src="js/game.js"></script></body></html>

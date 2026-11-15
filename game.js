@@ -1,0 +1,33 @@
+(function(){
+'use strict';
+var canvas=document.getElementById('gameCanvas'),ctx=canvas.getContext('2d'),N=20,C=30;
+var scoreEl=document.getElementById('score'),highEl=document.getElementById('highScore'),speedEl=document.getElementById('speedValue'),levelEl=document.getElementById('levelValue');
+var overlay=document.getElementById('overlay'),kicker=document.getElementById('overlayKicker'),title=document.getElementById('overlayTitle'),message=document.getElementById('overlayText'),action=document.getElementById('mainAction'),state=document.getElementById('arenaState'),pauseBtn=document.getElementById('pauseButton'),difficulty=document.getElementById('difficulty');
+var speeds={easy:175,normal:135,hard:100},delay=135,snake,food,dir,next,score=0,best=0,running=false,paused=false,loop=null,sound=true,audio=null;
+try{best=parseInt(localStorage.getItem('neonSnakeHighScore'),10)||0;}catch(e){}
+function pad(n){return ('000'+n).slice(-3);}
+function level(){return Math.floor(score/50)+1;}
+function tickDelay(){return Math.max(58,delay-Math.floor(score/50)*9);}
+function dashboard(){scoreEl.textContent=pad(score);highEl.textContent=pad(best);speedEl.textContent=(delay/tickDelay()).toFixed(1)+'x';levelEl.textContent=('0'+level()).slice(-2);}
+function randomFood(){var p,ok;do{p={x:Math.floor(Math.random()*N),y:Math.floor(Math.random()*N)};ok=true;for(var i=0;i<snake.length;i++){if(snake[i].x===p.x&&snake[i].y===p.y){ok=false;break;}}}while(!ok);return p;}
+function reset(){snake=[{x:9,y:10},{x:8,y:10},{x:7,y:10}];dir={x:1,y:0};next={x:1,y:0};score=0;food=randomFood();dashboard();draw();}
+function tone(freq,dur,type){if(!sound)return;try{var AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;if(!audio)audio=new AC();if(audio.state==='suspended')audio.resume();var o=audio.createOscillator(),g=audio.createGain();o.type=type||'sine';o.frequency.value=freq;g.gain.setValueAtTime(.05,audio.currentTime);g.gain.exponentialRampToValueAtTime(.001,audio.currentTime+dur);o.connect(g);g.connect(audio.destination);o.start();o.stop(audio.currentTime+dur);}catch(e){}}
+function roundRect(x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);ctx.lineTo(x+r,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-r);ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();}
+function draw(){ctx.fillStyle='#050b17';ctx.fillRect(0,0,600,600);ctx.strokeStyle='rgba(57,245,255,.075)';ctx.lineWidth=1;for(var i=0;i<=N;i++){var p=i*C+.5;ctx.beginPath();ctx.moveTo(p,0);ctx.lineTo(p,600);ctx.stroke();ctx.beginPath();ctx.moveTo(0,p);ctx.lineTo(600,p);ctx.stroke();}
+if(food){ctx.save();ctx.shadowColor='#39f5ff';ctx.shadowBlur=22;ctx.fillStyle='#c8ffff';ctx.beginPath();ctx.arc(food.x*C+15,food.y*C+15,8,0,Math.PI*2);ctx.fill();ctx.restore();}
+for(var j=snake.length-1;j>=0;j--){var s=snake[j];ctx.save();ctx.shadowColor=j?'#168bff':'#39f5ff';ctx.shadowBlur=j?9:18;ctx.fillStyle=j?(j%2?'#39dff5':'#168bff'):'#c5ffff';roundRect(s.x*C+3,s.y*C+3,24,24,5);ctx.fill();if(j===0){ctx.shadowBlur=0;ctx.fillStyle='#061322';ctx.fillRect(s.x*C+17,s.y*C+8,3,3);ctx.fillRect(s.x*C+17,s.y*C+19,3,3);}ctx.restore();}}
+function stop(){if(loop){clearInterval(loop);loop=null;}}
+function start(){stop();delay=speeds[difficulty.value]||135;reset();running=true;paused=false;overlay.className='overlay hidden';state.textContent='RUN IN PROGRESS';pauseBtn.disabled=false;pauseBtn.textContent='Ⅱ PAUSE';loop=setInterval(step,tickDelay());tone(520,.12,'triangle');}
+function show(k,t,m,b){kicker.textContent=k;title.innerHTML=t;message.textContent=m;action.textContent='▶ '+b;overlay.className='overlay';}
+function gameOver(){running=false;paused=false;stop();pauseBtn.disabled=true;state.textContent='RUN TERMINATED';if(score>best){best=score;try{localStorage.setItem('neonSnakeHighScore',String(best));}catch(e){}}dashboard();show('SIGNAL LOST // GAME OVER','RUN<br><span>COMPLETE.</span>','Final score: '+score+' points. The grid is waiting for your next run.','PLAY AGAIN');tone(120,.35,'sawtooth');}
+function pause(){if(!running)return;paused=!paused;if(paused){stop();pauseBtn.textContent='▶ RESUME';state.textContent='PAUSED';show('SYSTEM ON HOLD','TAKE A<br><span>BREATHER.</span>','Your run is paused. Resume when ready.','RESUME GAME');}else{overlay.className='overlay hidden';pauseBtn.textContent='Ⅱ PAUSE';state.textContent='RUN IN PROGRESS';loop=setInterval(step,tickDelay());}}
+function turn(x,y){if(!running||paused)return;if(x===-dir.x&&y===-dir.y)return;next={x:x,y:y};}
+function step(){if(!running||paused)return;dir=next;var head={x:snake[0].x+dir.x,y:snake[0].y+dir.y};if(head.x<0||head.x>=N||head.y<0||head.y>=N){gameOver();return;}var eating=head.x===food.x&&head.y===food.y,limit=eating?snake.length:snake.length-1;for(var i=0;i<limit;i++){if(snake[i].x===head.x&&snake[i].y===head.y){gameOver();return;}}snake.unshift(head);if(eating){score+=10;if(score>best)best=score;food=randomFood();tone(720+Math.min(score,300),.09);dashboard();stop();loop=setInterval(step,tickDelay());}else snake.pop();draw();}
+document.addEventListener('keydown',function(e){var k=(e.key||'').toLowerCase();if(k==='arrowup'||k==='w'){e.preventDefault();turn(0,-1);}else if(k==='arrowdown'||k==='s'){e.preventDefault();turn(0,1);}else if(k==='arrowleft'||k==='a'){e.preventDefault();turn(-1,0);}else if(k==='arrowright'||k==='d'){e.preventDefault();turn(1,0);}else if(k===' '||k==='spacebar'){e.preventDefault();pause();}else if((k==='enter')&&!running)start();});
+action.addEventListener('click',function(){if(running&&paused)pause();else start();});
+pauseBtn.addEventListener('click',pause);document.getElementById('restartButton').addEventListener('click',start);
+difficulty.addEventListener('change',function(){if(!running){delay=speeds[difficulty.value]||135;dashboard();}});
+document.getElementById('soundToggle').addEventListener('click',function(){sound=!sound;document.getElementById('soundLabel').textContent=sound?'SOUND ON':'SOUND OFF';if(sound)tone(600,.08,'triangle');});
+var touch=document.querySelectorAll('[data-dir]');for(var j=0;j<touch.length;j++){touch[j].addEventListener('click',function(){var d=this.getAttribute('data-dir');if(d==='up')turn(0,-1);if(d==='down')turn(0,1);if(d==='left')turn(-1,0);if(d==='right')turn(1,0);});}
+reset();highEl.textContent=pad(best);state.textContent='SYSTEM READY';
+}());
